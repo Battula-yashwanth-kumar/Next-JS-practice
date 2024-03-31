@@ -21,3 +21,63 @@ React Server Components(RSC)
 
  --> Next.js has a file-system based routing mechanism
  --> URL paths that users can access in the browser are defined by files and folder in your codebase
+
+
+ ------------> Routing Metadata <----------------
+
+ Ensuring proper search engine optimization (SEO) is crucial for increasing visibility and attracting users
+ Next.js introduced the metadata API which allows you to define metadata for each page
+ Metadata ensure accurate and relevant information is displayed when yournpages are shared or indexed.
+
+ Configuring Metadata
+
+ Export a static metadata object
+ Export a dynamic generateMetadata function
+
+ Metadata rules
+
+ Both layout.tsx and page.tsx files can export metadata. If defined in a layout, it applies to all pages in that layout, but if defined in a page, it applies only to that page
+ Metadata is read in order, from the root level down to the final page level
+ When there's metadata in multiple places for the same route , they get combined , but page metadata will replace layout metadata if they have the same properties
+
+ --------------------> Templates <-------------------
+
+ Templates are similar to layouts in that they wrap each child layout or page
+ But, with templates, when a user navigates between routes that share a templates, a new instance of the component ismounted, DOM elements are recreated , state is not preserved and the effects are re-synchronized.
+ A template can be defined by exporting a default React Component from a template.js or template.tsx file
+ Similar to layouts , templates also should accept a children prop which will render the nested segments in the route
+
+ --------------------> Loading.tsx Benefits <----------------------
+
+ you can display the loading state as soon as a user navigates to a new route
+ The immediate feedback reassures users that their action has been acknowledged, reduced preceived loading times, and makes the application feel more responsive.
+ Next.js allows the creation of shared layouts that remain interactive while newn route segments are loading
+ Users can continue interacting with certain parts of the application, shuch as a navigation menu or sidebar, even if the main content is still being fetched.
+
+ ------------------> Error.tsx <---------------------------------
+
+ Automatically wrap a route segment and its nested children in a React Error Boundary.
+ Create error UI tailored to specific segments using the file system hierarchy to adjust granularity.
+ Isolate Error to afftect segments while keeping the rest of the application functional.
+ Add functionality to attempt to recover from an error without a ful page reload.
+
+
+ -----------------> DashBoard (Parallel Routing)<--------------------
+
+ Parallel routes in Next.js are defined using a feature known as slots
+ Slots help strucutre our content in a modular fashion
+ To define a slot, we use the `@folder` naming convention
+ Each slot is then passed as a prop to its corresponding `layout.tsx` file.
+
+----------> Parallel Routes Benefits
+A clear benefit of parallel routes is their ability to split a single layout into various slots, making the code more manageable
+Independent route handling
+Sub-navigation
+
+-----------> Independent Route Handdling
+Each slot of your layout, such as user analytics or revenue metrics, can have its own laoding and Error states
+This granular control is particularly beneficial in scenarios where different sections of the page load at varying speeds or encounter unique errors
+
+------------> Sub Navigation in routes
+Each slot of your dashboard can essentially function as a mini-application, complete with its own navigation and state management
+This is especially useful in a complex application such as our dashboard where different section serve distinct purpose.
