@@ -81,3 +81,13 @@ This granular control is particularly beneficial in scenarios where different se
 ------------> Sub Navigation in routes
 Each slot of your dashboard can essentially function as a mini-application, complete with its own navigation and state management
 This is especially useful in a complex application such as our dashboard where different section serve distinct purpose.
+
+
+--------------------------------> Intercepting Routes <-----------------------------------
+
+---> Intercepting routes allow you to intercept or stop the default routing behaviour to present an alternate view or component when navigating through the UI, while still preserving the intednded route for scenarios like page reloads
+---> This can be useful if you want to show a route while keeping the context of the current page
+(.) to match segments on to same level
+(..) to match segments on level above
+(..)(..) to match segemnts two level above
+(...) to match segments from the root app directory
