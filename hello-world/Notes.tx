@@ -91,3 +91,30 @@ This is especially useful in a complex application such as our dashboard where d
 (..) to match segments on level above
 (..)(..) to match segemnts two level above
 (...) to match segments from the root app directory
+
+
+----------------->Headers in Route Handlers (Profile/api)<----------------------
+
+---> HTTp headers respresent the metadata associated with an API request and response.
+---> Request Headers
+
+-- These are sent by the client , such as a web browser, to the server. They contain essesntial information about the request, which helps the server understand and process oit correctly.
+-- 'User-Agent' whcih identifies the browser and operating system to the server.
+-- 'Accept' which indicates the conent types like text, video or image formats that the client can process.
+-- 'Authorization' header used by the client to aunthentication itself to the server. 
+
+---> ResponseHeaders
+
+-- THese are sent back from the server to the client. Tzhey provide information about the server and the data being sent in the response.
+-- "Content-Type' header which indicates the media type of the response. It tells the client what the data type of the returned conent is, such as text/html for HTML documents, application/json for JSON data, etc.
+
+
+---------------------> Caching in Route Handlers (time) <--------------------------
+
+-- Route Handlers are cached by default when using the GET method with the Response object in Next.js
+--> How to Opt out of caching ?
+
+- dynamic mode in Segment Config option
+- Using the Request object with the GET method
+- employing dynamic function like hesders() and cookies()
+- using any HTTP method other than GET
