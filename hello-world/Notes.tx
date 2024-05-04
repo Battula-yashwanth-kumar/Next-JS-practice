@@ -139,6 +139,8 @@ This is especially useful in a complex application such as our dashboard where d
       Each new feature added to the application increases the size of the javascript bundle, prolonging the wait tie for users to see the UI
 
       ---------------> Server Side Solutions <-------------------
+    
+    
       --It significantly improves SEO because search engines can easily index the server- rendered content.
       --Users can immediately see the page HTML content, instead of a blank screen or loading spinner
       --------------- Hydration --------------
@@ -175,3 +177,220 @@ This is especially useful in a complex application such as our dashboard where d
 
         Create an "all or nothing" waterfall problem that spans from the server to the client, where each issue must be resolved before moving ot the next one.
         TZHis is inefficient if some parts of your app are slower than ohters, as is often the case in real-world apps  
+
+        ------------------------> Drawbacks of SSR - All or Nothing Waterfall <-----------------------
+        -- Data fetching must be completed before the server can begin rendering HTML.
+        -- The javascript required for the components needs to be fully loaded on the client side before the hydration process can start.
+        -- All components have to be hydrated before they become interactive
+        - These issues contribute to an 'all or nothing' waterfall scenario, resulting in inefficiencies, especially if certin parts of your application are slower than others.
+        
+        ---> Suspense SSR Architecture
+        -- HTML streaming on the server
+        -- Selective hydration on the client
+
+        ----> HTML streaming on the Server
+        -- You don't have to fetch everything before you can show anything
+        -- If a particular section delays the initial HTML, it can be seamlessly integrated into the stream later
+        -- This is the essence of how Suspense facilitates server-side HTML streaming.
+        --->        Other Challenge
+        -- Until the javascript for the main section is loaded, client-side app hydration cannot start
+        -- And if the JavaScript bundle for the main section is large, this could significantly delay the porcess.
+
+        -----------> Soultion for other Challenges <---------
+
+        -- Code splitting allows you to mark specific code segments as not immediately necessary for loading, signalling your bundler to segregate them into separate `<script>` tags.
+        -- Using 'React.lazy' for code splitting enables you toi separate the main section's code from the primary Javascript bundle.
+        -- The JavaScript containing React and the code for the entire application, excluding the main section, can now be downloaded independently by the client, without having to wait for the main section's code
+
+        -----------> Solution for other Challenges <---------------
+
+        -- By wrapping the main section within`<Suspense>`, you've indicated to React that it should not prevent the rest of the page from not just streaming but also from hyderating
+        -- This feature called selective hydration allows for the hydration of  sections as they become available , before the rest of the HTML and the Javascript code are fully downloaded.
+        -- A heavy piece of JS doesn't prevent the rest of the page from becoming interactive
+
+        ------------> Selective Hydration on the Client contd <--------------
+
+        -- Selective Hydration offers a solution to the third issue : the necessity to "hydrate everyting to interact with anything"
+        -- React begins hydrating as soon as possible , enabling interactions with elements like the header and side navigation without waiting for the main content to be hydrated
+        -- This process is managed automatically by React
+        -- In scenarios where multiple components are awaiting hydration, React prioritizes hydration based on the user interactions.
+
+        --------------------> Drawbacks of Suspense SSR <----------------
+
+        -- First, even though Javascript code is streamed to the browser asynchronously, eventually, the entire code for a web page must be downloaded by the user
+        -- As applications add more features, the amount of code users need to download also grows. This leads to an important questions:
+        
+        -- Should users really have to download so much data ?
+
+        -- Second, the current approcach requires that all React components undergo hydration on the client-side, irrespective of their actual need for interactivity.
+        -- This process can inefficiebntly spend resources and extend the loading times and time to interactivity for users, as their devices need to process and render components that might not even require client-side interaction.
+
+        -- This leads to another question:
+        -- Should all components be hydrated, even those that don't need interactivity ?
+
+        -- Third, in spite of servers superior capacity for handling intensive processing tasks, the bulk of javascript execution still takes place on the user's devices
+        -- This can slow down the performance, especially on the devices that are not very powerful
+
+        -- This leads to another important question:
+        Should so much of the work be done on the user's device?
+
+        
+        --------------------------------> React Server Components (RSC) <----------------------
+
+        -- React Server Components(RSC) represent a new architecutre designed by the  React team
+        -- This approach aims to leverage the strengths of both server and client environments, optimizing for efficiency, load times, and interactivity
+        -- The architecture introduces a dual-components model
+          - Client components
+          - Server components
+        -- This distinction is not based on the functionality of the components but rather on where they executed and the specific environments they are deisgned to interact with
+
+        ---> Client Components
+
+        -- Client Components are the familiar React components we've been using
+        -- They are typically rendered on the client-side(CSR)but, they can also be rendered to HTML on the server (SSR), allowing users to immediatley see the page's HTML, content rather than a blank screen
+        -- Components that primarily run on the client but can also be executed once on the server as an optimization strategy
+        -- Client Components have access to the client environment, such as the browser, allowing them to use state, effects, and event listeners to handle interactivity and also access browser-exclusive APIs like geolocation or localStorage, allowing you to build UI for specific use cases
+        -- Infact, the term "Client Component" doesn't signify anything new; it simply helps diiferentiates these components from the newly introduced Server Components.
+
+        ---> Server Components
+
+        -- Server Components represent a new type of React component specifically designed to operate exclusively on the server.
+        -- And unlike client components, their code stays on the server and is never downloaded to the client
+        -- This design choice offers multiple benefits to React applications
+
+        ---> Benefits of Server Components
+
+        --- Reduced Bundle Sizes
+
+        -- Server Components do not send code to the client, allowing large dependencies to remain server-side
+        -- This benefits users with slower internet connections or less capable devices by eliminating the need toi download, parse and execute JavaScript for these components.
+        -- Additionally, it removes the hydration step, speeding up app loading and interaction.
+
+        --- Direct Access to Server-side resources
+
+        -- By having direct access to server-side resources like databases or file systems, Server Components enable data fetching and rendering without needing additional client-side processing
+        -- Leveraging the server's computational power and proximity to data sources, they manage compute-intensive rendering tasks and send only interactive pieces of code to the client.
+
+        --- Enhanced Secuirty
+
+        -- Server Components exclusive server-side execution enhances security by keeping senitive data and logic, including tokens and API keys, away from the  client-side.
+
+        --- Improved Data fetching
+
+        -- Server Components enhance data fetching efficiency
+        -- Typically, when fetching data no the client-side using useEffect, achild component cannot begin loading its data until the parent component has finished loading its own.
+        -- This sequential fetching of data often leads to poor performance.
+        -- The main issu is not the round trips themselves, but that these round trips are made from the client to the server
+        -- Server Components enables applications to shift these sequential round trips to the server side
+        -- By moving this logic to  the server, request latency is reduced, and overall performance is improved, eliminating  client-server "waterfalls"
+
+        -- Caching
+
+        -- Rendering on the server enables caching of th results, which can be resused in subsequent requests and across different users
+        -- THis approach can signinificantly improve performance and reduce costs by minimizing the amount of rendering and data fetching required for each request.
+
+        -- Faster Initial Page Load and First Contentful Paint
+
+        -- Sixth, Initial Page load and First Contentful Paint (FCP) are significantly improved with Server Components.
+        -- By generating HTML on the server, pages become immediately visible to users without the delay of downloading, parsing and executing Javascript.
+
+        -- Improved SEO
+
+        -- Regarding Search Engine Optimization (SEO), the server-rendered HTML is fully accessible to search engine bots, enhancing the indexability of ypur pages.
+
+        -- Efficient streaming
+
+        -- Server Components allows the rendering process to be divied into manageable chunks, which are then streamed to the client as soon as they are ready.
+        -- This approach allows users to start seeing parts of the page earlier, eliminating the need to wait for the entire page to finish renderig on the server
+
+        -- RSC contd
+
+        -- Server Components take charge of data fetching and static rendering , while client Components are tasled with rendering the interactive elements of the application.
+        -- The bottom line is that the RSC architecture enables React applications to leverage the best aspects of both server ad client rendering, all while using a single language , a single framework and a cohesive set of APIs.
+
+
+        ------------------------------> Static Rendering <-----------------------
+
+        -- Static rendering is a strategy where the HTML is generated at build time.
+        -- Along with the HTML,the RSC payload is  created for each component, and Javascript chunks are produced for client-side component hydration in the browser.
+        -- If you navigate directly to a page route, the corresponding HTML file is served
+        -- If you navigate to the route from a different one , the route is created on the client side using the RSC payload and Javascript chunks, without any additional requests to the server
+        -- Static rendering is great for performance and use cases include blogs, documention, marketing pages etc.
+
+
+        -------------------------------> Dynamic Rendering <----------------------------
+
+        -- Dynamic rendering is a server rendering strategy where routes are rendered  for each user at request time.
+        -- It is useful when a route has data that is personalized to the user or contains information that can only be known at request time, such as cookies or the URL's search parameters.
+        -- News websites, personalized e-commerce pages, and social media feeds are some examples where dynamicn rendering is beneficial.
+
+        ---> How to Dynamically Rendering
+
+        -- During rendering, if a dynamic function is discovered, Next.js will switch to dynamically rendering the whole route.
+        -- In Next.js, thses dynamic functions are: Cookies(),headers() and searchParams
+        -- Using any of these will opt the whole route into dynammic rendering at request time.
+
+
+        --------------------------------> Streaming <--------------------------------------
+
+        -- Streaming is a strategy that allows for progressive UI rendering from the server
+        -- Work is divided into chunks and streamed to the client as soon as it's ready
+        -- This enables users to see arts of the page immediately, before the entire content has finished rendering.
+        -- Straming significantly improves both the initial page loading performanceand the rendering of UI elements that tely on slower data fetches, which would otherwise block the rendering of the entire route.
+        -- Streaming in integrated into the NExt.js APP router by default.
+
+
+        ---------------------------------> Server and Client Composition Patterns <-----------------------
+
+        --> Server components
+        -- Fetching Data
+        -- Directly accessing backend resources
+        -- Protecting sensitive information (like access tokens and API keys) on the server.
+        -- Keeping large dependencies server-side, which helps in reducing client-side Javascript.
+
+        --> Client Components
+        -- Adding interactivity
+        -- Handling event listeners (suc as onClick(), onChange(), etc)
+        -- Managing state and lifecycle effects (using hooks like useState()), useReducer(), useEffect())
+        -- using broser-exclusive APIs
+        -- using custom hooks
+        -- using React class Components.
+
+        ----------------------------> Server-Only Code <-----------------------------
+
+        -- Certain code is intended to execute only on the server.
+        -- You might have modules or functions that use multiple libraries , use environment variable, interact directlu with a database or process confidently information.
+        -- Since Javascriopt modules can be shared it's possiboe for code that' meant only for the Server to unitentionally end up in the client
+        -- If server-side code gets bundled into the client-side Javascript , it could lead to a bloated bundle size, expose secret keys, database queries and sensitive business logic.
+        -- It is crucial to separate server-only code from client-side code to protect the application's security and integrity.
+        -- Provide a build-time error if developers accidentally import one of these modules into a client component.
+ 
+ -------------------------------------> Context Providers (Once need to Check while working on it) <-----------------------------------
+
+         -- Context provider are typically rendered near the root of an application to share global application state and logic
+         -- For Example, the application themselves\
+         -- However, since React context is not supported in Server Components , attemping to create a context at tyhe root of your application will result in an Error
+         -- To address this, you can create an render its provider inside a separate Client Component
+
+
+   --------------------------------------> Client Compoenent Placement <---------------------------
+
+   -- if you have five compoenents
+
+                               one
+                        ------   ------
+                        |             |
+                        |             |
+                        two           three
+                  -----   ------
+                 Four        Five
+
+         -- if component two is client component then four and five also will be client component
+         -- In this way if parent is client component then its children will also be client component
+
+
+         ----------------> Intervleaving Server and Client Components <------------------------
+         -- a client componenent can be rendered in side a client component and server component
+         -- but a server component can be rendered inside a client component
+         -- To render server component in side the client component, server component should be passed as  props in client componenent. 
+
